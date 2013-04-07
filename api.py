@@ -35,7 +35,7 @@ def get_by_tag(tag):
   flickr = []
 
   q.put((_get_tumblr_by_tag, tag, tumblr))
-  q.put((_get_flickr_by_tag, tag, flickr))
+  q.put((get_flickr_by_tag, tag, flickr))
 
   q.join()
   return tumblr+flickr
@@ -50,8 +50,8 @@ def _get_tumblr_by_tag(tag):
 
   return image_list
 
-def _get_flickr_by_tag(tag):
-  response = request.urlopen("http://api.flickr.com/services/rest/?method=flickr.photos.search&api_key={0}&tags={1}&format=json&nojsoncallback=1&per_page=20".format(constants.FLICKR_KEY, tag))
+def get_flickr_by_tag(tag, page=1):
+  response = request.urlopen("http://api.flickr.com/services/rest/?method=flickr.photos.search&api_key={0}&tags={1}&format=json&nojsoncallback=1&per_page=20&page={2}".format(constants.FLICKR_KEY, tag, page))
   response_obj = json.loads(response.read().decode("utf-8"))
   image_list = []
   for x in response_obj["photos"]["photo"]:
