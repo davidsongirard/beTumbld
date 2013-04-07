@@ -2,10 +2,43 @@ import json
 import io
 import constants
 from urllib import request
+import threading
+import queue
 
+class TagDownloader(threading.Thread):
+
+  def __init__(self, q):
+    threading.Thread.__init__(self)
+
+    self.q = q
+    self.data = None
+
+  def run(self):
+    while True:
+      func, tag, l = self.q.get()
+
+      l.append(func(tag))
+
+      self.q.task_done()
 
 def get_by_tag(tag):
-  return _get_tumblr_by_tag(tag) + _get_flickr_by_tag(tag)
+
+  q = queue.Queue()
+
+  for i in range(2):
+    t = TagDownloader(q)
+    t.setDaemon(True)
+    t.start()
+
+  tumblr = []
+  flickr = []
+
+  q.put((_get_tumblr_by_tag, tag, tumblr))
+  q.put((_get_flickr_by_tag, tag, flickr))
+
+  q.join()
+
+  return tumblr + flickr
 
 def _get_tumblr_by_tag(tag):
   response = request.urlopen('http://api.tumblr.com/v2/tagged?tag={0}&api_key={1}'.format(tag, constants.TUMBLR_KEY))
