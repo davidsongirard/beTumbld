@@ -4,6 +4,7 @@ import constants
 from urllib import request
 import threading
 import queue
+import itertools
 
 class TagDownloader(threading.Thread):
 
@@ -17,7 +18,7 @@ class TagDownloader(threading.Thread):
     while True:
       func, tag, l = self.q.get()
 
-      l.append(func(tag))
+      l.extend(func(tag))
 
       self.q.task_done()
 
@@ -37,8 +38,7 @@ def get_by_tag(tag):
   q.put((_get_flickr_by_tag, tag, flickr))
 
   q.join()
-
-  return tumblr + flickr
+  return tumblr+flickr
 
 def _get_tumblr_by_tag(tag):
   response = request.urlopen('http://api.tumblr.com/v2/tagged?tag={0}&api_key={1}'.format(tag, constants.TUMBLR_KEY))
