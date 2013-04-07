@@ -115,7 +115,7 @@ height = constants.IMAGE_SIZE * constants.IMAGES_HIGH
 size = width, height
 
 screen = pygame.display.set_mode(size)
-
+pygame.display.set_caption("beTumbld")
 screen.fill(constants.BLACK)
 
 squares = init_squares()
