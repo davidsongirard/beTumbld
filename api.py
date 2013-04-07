@@ -31,5 +31,3 @@ def _get_flickr_by_tag(tag):
 def get_image(url):
   response = request.urlopen(url)
   return io.BytesIO(response.read())
-
-_get_tumblr_by_tag("horse")

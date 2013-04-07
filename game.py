@@ -3,39 +3,55 @@ import sys
 import random
 import constants
 import gridimage
+import api
 
-def draw_at_grid(surface, grid, color):
-    r = pygame.Rect(grid[0] * constants.IMAGE_SIZE,
-                    grid[1] * constants.IMAGE_SIZE,
-                    constants.IMAGE_SIZE,
-                    constants.IMAGE_SIZE)
+tag_set = ["horse", "cat", "apple", "dog"]
 
-    pygame.draw.rect(surface,
-                     color,
-                     r)
+image_link_set = []
+
+for x in tag_set:
+  image_link_set.append(api.get_by_tag(x))
+
+image_set = {}
+for x in image_link_set:
+  image_set[x] = []
+  for y in x:
+    image = pygame.image.load(api.get_image(y), y)
+    image_set[x].append(image)
+
+def draw_at_grid(surface, grid, image):
+  box_size = min(image.get_width(), image.get_height())
+  new_image = pygame.Surface((box_size, box_size))
+  new_image.blit(image, (0, 0))
+
+  new_image = pygame.transform.scale(new_image, (constants.IMAGE_SIZE,constants.IMAGE_SIZE))
+
+  screen.blit(new_image, (grid[0]*constants.IMAGE_SIZE,grid[1]*constants.IMAGE_SIZE)) 
+
 
 def draw_squares(surface, squares):
     screen.fill(constants.BLACK)
     for col_num, col in enumerate(squares):
         for row_num, gi in enumerate(col):
             if gi == None:
-                draw_at_grid(screen, (row_num, col_num),
-                             constants.BLACK)
+                #draw_at_grid(screen, (row_num, col_num),
+              pass
+                             #constants.BLACK)
             else:
                 draw_at_grid(screen, (row_num, col_num),
-                             gi.color)
+                             gi.surface)
     pygame.display.flip()
 
 def new_random_square(pos):
-    return gridimage.GridImage(pos, constants.D_COLORS[random.randint(0,3)])
+    return gridimage.GridImage(pos,image,constants.D_COLORS[random.randint(0,3)])
 
 def init_squares():
     sqs = []
     for col in range(constants.IMAGES_WIDE):
         col_list = []
         for row in range(constants.IMAGES_HIGH):
-            color = new_random_square((row, col))
-            col_list.append(color)
+            value = new_random_square((row, col))
+            col_list.append(value)
         sqs.append(col_list)
 
     return sqs
@@ -51,7 +67,7 @@ def check_clicks(squares, pos):
 def all_same(grids):
     prev = grids[0]
     for grid in grids:
-        if grid.color != prev.color:
+        if grid.value != prev.value:
             return False
         prev = grid
     return True
@@ -85,7 +101,9 @@ clock = pygame.time.Clock()
 
 selected_grids = []
 
+
 while 1:
+    # Pull down images before game loads 
     clock.tick(60)
     draw_squares(screen, squares)
     for event in pygame.event.get():
