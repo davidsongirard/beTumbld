@@ -2,9 +2,10 @@ import constants
 
 class GridImage():
 
-    def __init__(self, pos, color):
+    def __init__(self, pos, surface, value):
         self.pos = pos
-        self.color = color
+        self.surface = surface 
+        self.value = value 
 
     def check_click(self, click_pos):
         if (self.pos[0] * constants.IMAGE_SIZE
