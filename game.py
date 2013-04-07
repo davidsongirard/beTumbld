@@ -17,14 +17,14 @@ for i in range(constants.THREAD_POOL_SIZE):
   t.setDaemon(True)
   t.start()
 
-for x in tag_set:
-  image_link_set[x] = api.get_by_tag(x)
-  image_inc[x] = 1
+for tag in tag_set:
+  image_link_set[tag] = api.get_by_tag(tag)
+  image_inc[tag] = 1
 
 image_bytes = {}
 for tag in tag_set:
   image_list = []
-  for y in image_link_set[x]:
+  for y in image_link_set[tag]:
     img_queue.put((y, image_list))
   image_bytes[tag] = image_list
 
