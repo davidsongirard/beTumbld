@@ -7,17 +7,18 @@ import api
 
 tag_set = ["horse", "cat", "apple", "dog"]
 
-image_link_set = []
+image_link_set = {}
 
 for x in tag_set:
-  image_link_set.append(api.get_by_tag(x))
+  image_link_set[x] = api.get_by_tag(x)
 
 image_set = {}
-for x in image_link_set:
-  image_set[x] = []
-  for y in x:
+for x in tag_set:
+  image_list = []
+  for y in image_link_set[x]:
     image = pygame.image.load(api.get_image(y), y)
-    image_set[x].append(image)
+    image_list.append(image)
+  image_set[x] = image_list
 
 def draw_at_grid(surface, grid, image):
   box_size = min(image.get_width(), image.get_height())
@@ -33,17 +34,12 @@ def draw_squares(surface, squares):
     screen.fill(constants.BLACK)
     for col_num, col in enumerate(squares):
         for row_num, gi in enumerate(col):
-            if gi == None:
-                #draw_at_grid(screen, (row_num, col_num),
-              pass
-                             #constants.BLACK)
-            else:
-                draw_at_grid(screen, (row_num, col_num),
-                             gi.surface)
+          draw_at_grid(screen, (row_num, col_num), gi.surface)
     pygame.display.flip()
 
 def new_random_square(pos):
-    return gridimage.GridImage(pos,image,constants.D_COLORS[random.randint(0,3)])
+    tag = random.sample(tag_set,1)[0]
+    return gridimage.GridImage(pos,image_set[tag].pop(),tag)
 
 def init_squares():
     sqs = []
@@ -101,9 +97,7 @@ clock = pygame.time.Clock()
 
 selected_grids = []
 
-
 while 1:
-    # Pull down images before game loads 
     clock.tick(60)
     draw_squares(screen, squares)
     for event in pygame.event.get():
