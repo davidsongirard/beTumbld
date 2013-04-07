@@ -141,3 +141,9 @@ while 1:
                     update_positions(squares)
             elif event.button == 3:
                 selected_grids = []
+            for col in squares:
+              for gi in col:
+                if gi in selected_grids:
+                  gi.surface.set_alpha(125)
+                else:
+                  gi.surface.set_alpha(255)
