@@ -26,12 +26,15 @@ def draw_squares(surface, squares):
                              gi.color)
     pygame.display.flip()
 
+def new_random_square(pos):
+    return gridimage.GridImage(pos, constants.D_COLORS[random.randint(0,3)])
+
 def init_squares():
     sqs = []
     for col in range(constants.IMAGES_WIDE):
         col_list = []
         for row in range(constants.IMAGES_HIGH):
-            color = gridimage.GridImage((row, col), constants.D_COLORS[random.randint(0,3)])
+            color = new_random_square((row, col))
             col_list.append(color)
         sqs.append(col_list)
 
@@ -48,12 +51,25 @@ def check_clicks(squares, pos):
 def all_same(grids):
     prev = grids[0]
     for grid in grids:
-        print(prev, grid)
         if grid.color != prev.color:
             return False
         prev = grid
-
     return True
+
+def move(squares):
+    new_cols = []
+    for col_num, col in enumerate(squares):
+        new_col = [x for x in col if x is not None]
+        new_squares = [new_random_square((x, col_num)) for x in range(constants.IMAGES_HIGH - len(new_col))]
+
+        new_cols.append(new_squares + new_col)
+    squares[:] = new_cols
+
+def update_positions(squares):
+    for col_num, col in enumerate(squares):
+        for row_num, square in enumerate(col):
+            square.pos = row_num, col_num
+
 
 pygame.init()
 width = constants.IMAGE_SIZE * constants.IMAGES_WIDE
@@ -76,7 +92,6 @@ while 1:
         if event.type == pygame.QUIT:
             sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            print(event)
             if event.button == 1:
                 selected_grids.append(check_clicks(squares, event.pos))
                 if len(selected_grids) == 3:
@@ -84,10 +99,7 @@ while 1:
                         for grid in selected_grids:
                             squares[grid.pos[1]][grid.pos[0]] = None
                     selected_grids = []
-
+                    move(squares)
+                    update_positions(squares)
             elif event.button == 3:
                 selected_grids = []
-
-            print(selected_grids)
-
-    pygame.display.flip()
