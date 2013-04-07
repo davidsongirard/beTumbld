@@ -15,7 +15,7 @@ def _get_tumblr_by_tag(tag):
     if x["type"] == "photo":
       image_list.append(x["photos"][0]["original_size"]["url"])
 
-  return image_list 
+  return image_list
 
 def _get_flickr_by_tag(tag):
   response = request.urlopen("http://api.flickr.com/services/rest/?method=flickr.photos.search&api_key={0}&tags={1}&format=json&nojsoncallback=1&per_page=20".format(constants.FLICKR_KEY, tag))
@@ -31,5 +31,3 @@ def _get_flickr_by_tag(tag):
 def get_image(url):
   response = request.urlopen(url)
   return io.BytesIO(response.read())
-
-_get_tumblr_by_tag("horse")
