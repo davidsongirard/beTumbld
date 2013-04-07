@@ -5,22 +5,24 @@ from urllib import request
 import threading
 import queue
 import itertools
+import pygame
 
 class ImageBackgroundDownloader(threading.Thread):
 
   def __init__(self, tag, image_set, page):
+    threading.Thread.__init__(self)
     self.tag = tag
     self.image_set = image_set
-    self.page = page 
+    self.page = page
 
   def run(self):
       print("starting")
       new_images = get_flickr_by_tag(self.tag,self.page)
       for x in new_images:
-        image = pygame.image.load(api.get_image(x), x)
-        image_set[self.tag].append(image)
+        image = pygame.image.load(get_image(x), x)
+        self.image_set[self.tag].append(image)
       print("finishing")
-    
+
 
 class TagDownloader(threading.Thread):
 

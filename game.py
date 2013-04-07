@@ -6,7 +6,7 @@ import gridimage
 import api
 import queue
 
-tag_set = ["horse", "cat", "apple", "dog"]
+tag_set = sys.argv[1:]
 
 image_link_set = {}
 image_inc = {}
@@ -63,7 +63,7 @@ def new_random_square(pos):
       bg_thread = api.ImageBackgroundDownloader(tag, image_set, image_inc[tag])
       bg_thread.daemon = True
       bg_thread.start();
-      
+
     return gridimage.GridImage(pos,image_set[tag].pop(),tag)
 
 def init_squares():
@@ -83,6 +83,7 @@ def check_clicks(squares, pos):
             if square is None:
                 continue
             if square.check_click(pos):
+                print(square)
                 return square
 
 def all_same(grids):
@@ -114,7 +115,7 @@ height = constants.IMAGE_SIZE * constants.IMAGES_HIGH
 size = width, height
 
 screen = pygame.display.set_mode(size)
-
+pygame.display.set_caption("beTumbld")
 screen.fill(constants.BLACK)
 
 squares = init_squares()
@@ -130,7 +131,11 @@ while 1:
             sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
-                selected_grids.append(check_clicks(squares, event.pos))
+                grid_clicked = check_clicks(squares, event.pos)
+                if grid_clicked not in selected_grids:
+                  selected_grids.append(grid_clicked)
+                else:
+                  selected_grids.remove(grid_clicked)
                 if len(selected_grids) == 3:
                     if all_same(selected_grids):
                         for grid in selected_grids:
