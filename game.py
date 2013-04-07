@@ -60,10 +60,10 @@ def new_random_square(pos):
     tag = random.sample(tag_set,1)[0]
     if len(image_set[tag]) < 10:
       image_inc[tag] += 1
-      new_images = api.get_flickr_by_tag(tag,image_inc[tag])
-      for x in new_images:
-        image = pygame.image.load(api.get_image(x), x)
-        image_set[tag].append(image)
+      bg_thread = api.ImageBackgroundDownloader(tag, image_set, image_inc[tag])
+      bg_thread.daemon = True
+      bg_thread.start();
+      
     return gridimage.GridImage(pos,image_set[tag].pop(),tag)
 
 def init_squares():
@@ -131,7 +131,6 @@ while 1:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 selected_grids.append(check_clicks(squares, event.pos))
-                print(check_clicks(squares, event.pos))
                 if len(selected_grids) == 3:
                     if all_same(selected_grids):
                         for grid in selected_grids:
