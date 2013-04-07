@@ -8,9 +8,11 @@ import api
 tag_set = ["horse", "cat", "apple", "dog"]
 
 image_link_set = {}
+image_inc = {}
 
 for x in tag_set:
   image_link_set[x] = api.get_by_tag(x)
+  image_inc[x] = 1
 
 image_set = {}
 for x in tag_set:
@@ -39,6 +41,14 @@ def draw_squares(surface, squares):
 
 def new_random_square(pos):
     tag = random.sample(tag_set,1)[0]
+    if len(image_set[tag]) < 10:
+      image_inc[tag] += 1
+      new_images = api.get_flickr_by_tag(tag,image_inc[tag])
+      for x in new_images:
+        image = pygame.image.load(api.get_image(x), x)
+        image_set[tag].append(image)
+
+      print("finished")
     return gridimage.GridImage(pos,image_set[tag].pop(),tag)
 
 def init_squares():
