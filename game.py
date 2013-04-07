@@ -4,32 +4,49 @@ import random
 import constants
 import gridimage
 import api
+import queue
 
 tag_set = ["horse", "cat", "apple", "dog"]
 
 image_link_set = {}
 image_inc = {}
+img_queue = queue.Queue()
+
+for i in range(constants.THREAD_POOL_SIZE):
+  t = api.ImageDownloader(img_queue)
+  t.setDaemon(True)
+  t.start()
 
 for x in tag_set:
   image_link_set[x] = api.get_by_tag(x)
   image_inc[x] = 1
 
-image_set = {}
-for x in tag_set:
+image_bytes = {}
+for tag in tag_set:
   image_list = []
   for y in image_link_set[x]:
-    image = pygame.image.load(api.get_image(y), y)
+    img_queue.put((y, image_list))
+  image_bytes[tag] = image_list
+
+img_queue.join()
+
+image_set = {}
+for tag, img_bytes in image_bytes.items():
+  image_list = []
+  for y in image_bytes[tag]:
+    image = pygame.image.load(y[0], y[1])
     image_list.append(image)
-  image_set[x] = image_list
+  image_set[tag] = image_list
 
 def draw_at_grid(surface, grid, image):
+
   box_size = min(image.get_width(), image.get_height())
   new_image = pygame.Surface((box_size, box_size))
   new_image.blit(image, (0, 0))
 
   new_image = pygame.transform.scale(new_image, (constants.IMAGE_SIZE,constants.IMAGE_SIZE))
 
-  screen.blit(new_image, (grid[0]*constants.IMAGE_SIZE,grid[1]*constants.IMAGE_SIZE)) 
+  screen.blit(new_image, (grid[0]*constants.IMAGE_SIZE,grid[1]*constants.IMAGE_SIZE))
 
 
 def draw_squares(surface, squares):
@@ -47,8 +64,6 @@ def new_random_square(pos):
       for x in new_images:
         image = pygame.image.load(api.get_image(x), x)
         image_set[tag].append(image)
-
-      print("finished")
     return gridimage.GridImage(pos,image_set[tag].pop(),tag)
 
 def init_squares():
@@ -116,6 +131,7 @@ while 1:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 selected_grids.append(check_clicks(squares, event.pos))
+                print(check_clicks(squares, event.pos))
                 if len(selected_grids) == 3:
                     if all_same(selected_grids):
                         for grid in selected_grids:

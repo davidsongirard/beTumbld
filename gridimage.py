@@ -4,8 +4,8 @@ class GridImage():
 
     def __init__(self, pos, surface, value):
         self.pos = pos
-        self.surface = surface 
-        self.value = value 
+        self.surface = surface
+        self.value = value
 
     def check_click(self, click_pos):
         if (self.pos[0] * constants.IMAGE_SIZE
@@ -25,4 +25,4 @@ class GridImage():
         return self.__unicode__()
 
     def __unicode__(self):
-        return "<GridImage pos={0}>".format(self.pos)
+        return "<GridImage pos={0}, val={1}>".format(self.pos, self.value)
